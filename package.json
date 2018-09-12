@@ -1,0 +1,31 @@
+{
+  "name": "tutorial-etl",
+  "version": "1.0.0",
+  "description": "OpenWhisk ETL tutorial",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "van_staub@us.ibm.com",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/chai": "^4.1.4",
+    "@types/mocha": "^5.2.5",
+    "@types/node": "^10.5.5",
+    "@types/request-promise": "^4.1.42",
+    "@types/swagger-schema-official": "^2.0.10",
+    "chai": "^4.1.2",
+    "mocha": "^5.2.0",
+    "ts-loader": "^4.4.2",
+    "ts-node": "^7.0.0",
+    "typescript": "^3.0.1",
+    "webpack": "^4.16.4",
+    "webpack-cli": "^3.1.0"
+  },
+  "dependencies": {
+    "jsonata": "^1.5.4",
+    "openwhisk": "^3.17.0",
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2",
+    "swagger-schema-official": "^2.0.0-bab6bed"
+  }
+}

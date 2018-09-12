@@ -1,0 +1,119 @@
+packages:
+  tutorial-etl-dashboard:
+    version: 1.0
+    license: Apache-2.0
+    dependencies:
+      openwhisk-cognos-dashboard:
+        location: github.com/IBM-Cloud/openwhisk-cognos-dashboard
+    inputs:
+      apiGatewayId: ${API_GATEWAY_ID}
+    actions:
+      billing-table:
+        function: dist/Module.js
+        runtime: nodejs:8
+        inputs:
+          table: |
+                  {
+                    "name": "Usage",
+                    "description": "IBM Cloud usage",
+                    "column": [
+                      {
+                        "name": "Date",
+                        "datatype": "NVARCHAR(8)",
+                        "nullable": false,
+                        "description": "Date",
+                        "label": "Date",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "Account_ID",
+                        "datatype": "NVARCHAR(64)",
+                        "nullable": false,
+                        "description": "Account ID",
+                        "label": "Account ID",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "Resource_ID",
+                        "datatype": "NVARCHAR(64)",
+                        "nullable": false,
+                        "description": "Resource ID",
+                        "label": "Resource ID",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "Resource_Name",
+                        "datatype": "NVARCHAR(256)",
+                        "nullable": false,
+                        "description": "Resource Name",
+                        "label": "Resource Name",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "Cost",
+                        "datatype": "DECIMAL(38,2)",
+                        "nullable": false,
+                        "description": "Cost",
+                        "label": "Cost",
+                        "usage": "fact",
+                        "regularAggregate": "total"
+                      },
+                      {
+                        "name": "ORG_ID",
+                        "datatype": "NVARCHAR(64)",
+                        "nullable": true,
+                        "description": "Cloud Foundry Organization ID",
+                        "label": "Org ID",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "ORG_NAME",
+                        "datatype": "NVARCHAR(256)",
+                        "nullable": true,
+                        "description": "Cloud Foundry Organization Name",
+                        "label": "Org Name",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "RESOURCE_GROUP_ID",
+                        "datatype": "NVARCHAR(64)",
+                        "nullable": true,
+                        "description": "Resource Group ID",
+                        "label": "Resource Group ID",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      },
+                      {
+                        "name": "RESOURCE_GROUP_NAME",
+                        "datatype": "NVARCHAR(256)",
+                        "nullable": true,
+                        "description": "Resource Group Name",
+                        "label": "Resource Group Name",
+                        "usage": "attribute",
+                        "regularAggregate": "countDistinct"
+                      }
+                    ]
+                  }
+      billing-spec:
+        function: dist/Spec.js
+        runtime: nodejs:8
+        inputs:
+          spec: |
+                {"name":"New dashboard","layout":{"id":"page0","items":[{"id":"page1","items":[{"id":"page2","css":"templateBox aspectRatio_default","items":[{"id":"page3","style":{"top":"0%","left":"0%","right":"0%","bottom":"75%"},"type":"templateDropZone","templateName":"dz1","relatedLayouts":""},{"id":"page4","css":"noBorderTop","style":{"top":"25%","left":"0%","right":"0%","bottom":"0%"},"type":"templateDropZone","templateName":"dz2","relatedLayouts":""},{"id":"model00000165cf001feb_00000000","style":{"top":"25.101214574898787%","left":"0.111358574610245%","height":"74.89878542510121%","width":"81.9599109131403%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cefe20e1_00000003","style":{"top":"0.20242914979757085%","left":"51.224944320712694%","height":"24.696356275303643%","width":"48.88641425389755%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cefd19fc_00000003","style":{"left":"0.07930214115781126%","top":"0.1443001443001443%","height":"24.675324675324674%","width":"51.149881046788266%"},"type":"widget","relatedLayouts":""},{"id":"model00000165ceffcb43_00000003","style":{"left":"81.9599109131403%","top":"24.898785425101213%","height":"37.65182186234818%","width":"18.262806236080177%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cf02fcbe_00000003","style":{"left":"82.29398663697104%","top":"55.06072874493927%","height":"44.93927125506073%","width":"17.706013363028955%"},"type":"widget","relatedLayouts":""}],"type":"scalingAbsolute"}],"type":"container","title":{"translationTable":{"Default":"Account"}},"templateName":"Template2"},{"id":"model00000165cf058b7a_00000000","items":[{"id":"model00000165cf058b7a_00000001","css":"templateBox aspectRatio_default","items":[{"id":"model00000165cf058b7a_00000002","style":{"top":"0%","left":"0%","right":"0%","bottom":"75%"},"type":"templateDropZone","templateName":"dz1","relatedLayouts":""},{"id":"model00000165cf058b7a_00000003","css":"noBorderTop","style":{"top":"25%","left":"0%","right":"0%","bottom":"0%"},"type":"templateDropZone","templateName":"dz2","relatedLayouts":""},{"id":"model00000165cf1cbb37_00000000","style":{"top":"24.898785425101213%","left":"50.22271714922049%","height":"74.89878542510121%","width":"49.77728285077951%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cf1ae64c_00000000","style":{"top":"24.898785425101213%","left":"0.111358574610245%","height":"75.50607287449392%","width":"50.22271714922049%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cf07a857_00000002","style":{"top":"0.20242914979757085%","left":"31.403118040089087%","height":"24.696356275303643%","width":"37.193763919821826%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cf086b7d_00000003","style":{"left":"68.37416481069042%","top":"0.20242914979757085%","height":"24.493927125506072%","width":"31.625835189309576%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cf091c73_00000003","style":{"left":"0.111358574610245%","top":"0.20242914979757085%","height":"24.291497975708502%","width":"31.29175946547884%"},"type":"widget","relatedLayouts":""}],"type":"scalingAbsolute"}],"type":"container","title":{"translationTable":{"Default":"Cloud Foundry"}},"templateName":"Template2"},{"id":"model00000165cf1f0226_00000000","items":[{"id":"model00000165cf1f0227_00000000","css":"templateBox aspectRatio_default","items":[{"id":"model00000165cf1f0227_00000001","style":{"top":"0%","left":"0%","right":"0%","bottom":"75%"},"type":"templateDropZone","templateName":"dz1","relatedLayouts":""},{"id":"model00000165cf1f0227_00000002","css":"noBorderTop","style":{"top":"25%","left":"0%","right":"0%","bottom":"0%"},"type":"templateDropZone","templateName":"dz2","relatedLayouts":""},{"id":"model00000165cf203a72_00000000","style":{"top":"0%","left":"0.111358574610245%","height":"99.59514170040485%","width":"100.11135857461025%"},"type":"widget","relatedLayouts":""},{"id":"model00000165cf1f4719_00000003","style":{"top":"64.17004048582996%","left":"76.39198218262806%","height":"35.82995951417004%","width":"23.608017817371937%"},"type":"widget","relatedLayouts":""}],"type":"scalingAbsolute"}],"type":"container","title":{"translationTable":{"Default":"IAM"}},"templateName":"Template2"}],"style":{"height":"100%"},"type":"tab"},"theme":"defaultTheme","version":1008,"eventGroups":[{"id":"page1:1","widgetIds":["model00000165cefd19fc_00000003","model00000165cefe20e1_00000003","model00000165ceffcb43_00000003","model00000165cf001feb_00000000","model00000165cf02fcbe_00000003"]},{"id":"model00000165cf058b7a_00000000:1","widgetIds":["model00000165cf07a857_00000002","model00000165cf086b7d_00000003","model00000165cf091c73_00000003","model00000165cf1ae64c_00000000","model00000165cf1cbb37_00000000"]},{"id":"model00000165cf1f0226_00000000:1","widgetIds":["model00000165cf1f4719_00000003","model00000165cf203a72_00000000"]}],"properties":{"defaultLocale":"Default"},"dataSources":{"version":"1.0","sources":[{"id":"model00000165cefceed9_00000002","assetId":"assetId00000165cefceed9_00000000","clientId":"ow-data","module":{"source":{"id":"ow-module","srcUrl":{"sourceUrl":"https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/7fe86f1fbc650a22eb91055d0293362256aed2aac318d72da53d9370f3c04be3/sql/results?job_id=0b35df72-dc61-4481-83ea-d572a2bb9792","mimeType":"text/csv","property":[{"name":"separator","value":","},{"name":"ColumnNamesLine","value":"true"}]}},"identifier":"ow-data","label":"Usage","xsd":"https://ibm.com/daas/module/1.0/module.xsd","table":{"name":"Usage","description":"IBM Cloud usage","column":[{"nullable":false,"name":"Date","regularAggregate":"countDistinct","description":"Date","usage":"attribute","label":"Date","datatype":"NVARCHAR(8)"},{"nullable":false,"name":"Account_ID","regularAggregate":"countDistinct","description":"Account ID","usage":"attribute","label":"Account ID","datatype":"NVARCHAR(64)"},{"nullable":false,"name":"Resource_ID","regularAggregate":"countDistinct","description":"Resource ID","usage":"attribute","label":"Resource ID","datatype":"NVARCHAR(64)"},{"nullable":false,"name":"Resource_Name","regularAggregate":"countDistinct","description":"Resource Name","usage":"attribute","label":"Resource Name","datatype":"NVARCHAR(256)"},{"nullable":false,"name":"Cost","regularAggregate":"total","description":"Cost","usage":"fact","label":"Cost","datatype":"DECIMAL(38,2)"},{"nullable":true,"name":"ORG_ID","regularAggregate":"countDistinct","description":"Cloud Foundry Organization ID","usage":"attribute","label":"Org ID","datatype":"NVARCHAR(64)"},{"nullable":true,"name":"ORG_NAME","regularAggregate":"countDistinct","description":"Cloud Foundry Organization Name","usage":"attribute","label":"Org Name","datatype":"NVARCHAR(256)"},{"nullable":true,"name":"RESOURCE_GROUP_ID","regularAggregate":"countDistinct","description":"Resource Group ID","usage":"attribute","label":"Resource Group ID","datatype":"NVARCHAR(64)"},{"nullable":true,"name":"RESOURCE_GROUP_NAME","regularAggregate":"countDistinct","description":"Resource Group Name","usage":"attribute","label":"Resource Group Name","datatype":"NVARCHAR(256)"}]}},"name":"Usage","shaping":{"shapingId":"shaping00000165cf038e00_00000000","embeddedModuleUpToDate":false,"moserJSON":{"version":"5.0","container":"C","useSpec":[{"identifier":"ES","type":"url","storeID":"baseModule","imports":"*"}],"expressionLocale":"en-us","calculation":[{"expression":"IF (Usage_.ORG_ID = '') THEN ('Resource') ELSE ('Cloud Foundry')","usage":"attribute","datatype":"VARCHAR(13)","nullable":true,"regularAggregate":"minimum","datatypeCategory":"string","highlevelDatatype":"string","facetDefinition":{"enabled":"automatic"},"identifier":"Resource_Type","label":"Resource Type","property":[{"name":"ui_expr","value":"{\"func\":\"customCalculation\",\"version\":\"5.0\"}"}],"propertyOverride":["NEW"]}],"metadataTreeView":[{"folderItem":[{"ref":"Resource_Type"}]}],"dataRetrievalMode":"liveConnection","identifier":"newModel","label":"newModel"}}}]},"pageContext":[{"origin":"visualization","table":"","alias":"0","sourceId":"model00000165cefceed9_00000002","hierarchies":[{"hierarchyUniqueName":"Usage_.Account_ID"}],"scope":"page1","hierarchyUniqueNames":["Usage_.Account_ID"],"eventSourceId":"model00000165ceffcb43_00000003","eventGroupId":"page1:1","tupleSet":"{\"Usage_.Account_ID->[e97a8c01ac694e308ef3ad77958e7d50]\":{\"u\":\"Usage_.Account_ID->[e97a8c01ac694e308ef3ad77958e7d50]\",\"d\":\"e97a8c01ac694e308ef3ad77958e7d50\"}}"}],"drillThrough":[],"widgets":{"model00000165cefd19fc_00000003":{"id":"model00000165cefd19fc_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cefd19fc_00000000","itemId":"Usage_.Cost","itemLabel":"Cost","format":{"id":"0digit","localizedString":"789","formatSpec":{"type":"number","maximumFractionDigits":0,"selectedFormat":"0digit"}}}],"id":"model00000165cefd19fc_00000001"}]},"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cefd19fc_00000000"],"dataItemSettings":[],"caption":"Value","id":"values","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.ORG_ID","columnId":"Usage_.ORG_ID","values":[{"u":"Usage_.ORG_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null}],"visId":"summary"},"model00000165cefe20e1_00000003":{"id":"model00000165cefe20e1_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cefe20e1_00000000","itemId":"Usage_.Cost","itemLabel":"Cost","format":{"id":"0digit","localizedString":"789","formatSpec":{"type":"number","maximumFractionDigits":0,"selectedFormat":"0digit"}}}],"id":"model00000165cefe20e1_00000001"}]},"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cefe20e1_00000000"],"dataItemSettings":[],"caption":"Value","id":"values","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.RESOURCE_GROUP_ID","columnId":"Usage_.RESOURCE_GROUP_ID","values":[{"u":"Usage_.RESOURCE_GROUP_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null}],"visId":"summary"},"model00000165ceffcb43_00000003":{"id":"model00000165ceffcb43_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165ceffcb43_00000000","itemId":"Usage_.Account_ID","itemLabel":"Account ID"}],"id":"model00000165ceffcb43_00000001"}]},"slotmapping":{"slots":[{"name":"level1","dataItems":["model00000165ceffcb43_00000000"],"caption":"Level one","id":"level1","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"visId":"list"},"model00000165cf001feb_00000000":{"id":"model00000165cf001feb_00000000","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf002b8e_00000001","itemId":"Usage_.Cost","itemLabel":"Cost"},{"id":"model00000165cf007c77_00000001","itemId":"Usage_.Resource_Name","itemLabel":"Resource Name"}],"id":"model00000165cf002b8e_00000000"}]},"visTypeLocked":true,"slotmapping":{"slots":[{"name":"size","dataItems":["model00000165cf002b8e_00000001"],"caption":"Size","id":"size"},{"name":"categories","dataItems":["model00000165cf007c77_00000001"],"dataItemSettings":[],"caption":"Area hierarchy","id":"categories"}]},"type":"live","visId":"com.ibm.vis.rave2bundletreemap","name":{"translationTable":{}},"localFilters":[]},"model00000165cf02fcbe_00000003":{"id":"model00000165cf02fcbe_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf02fcbe_00000000","itemId":"Resource_Type","itemLabel":"Resource Type"}],"id":"model00000165cf02fcbe_00000001"}]},"slotmapping":{"slots":[{"name":"level1","dataItems":["model00000165cf02fcbe_00000000"],"caption":"Level one","id":"level1","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"visId":"list"},"model00000165cf07a857_00000002":{"id":"model00000165cf07a857_00000002","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf07a856_00000000","itemId":"Usage_.Cost","itemLabel":"Cost"}],"id":"model00000165cf07a857_00000000"}]},"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cf07a856_00000000"],"dataItemSettings":[],"caption":"Value","id":"values","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.RESOURCE_GROUP_ID","columnId":"Usage_.RESOURCE_GROUP_ID","values":[{"u":"Usage_.RESOURCE_GROUP_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null}],"visId":"summary"},"model00000165cf086b7d_00000003":{"id":"model00000165cf086b7d_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf086b7d_00000000","itemId":"Usage_.Resource_Name","itemLabel":"Resource Name"}],"id":"model00000165cf086b7d_00000001"}]},"visTypeLocked":true,"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cf086b7d_00000000"],"dataItemSettings":[],"caption":"Value","id":"values","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"visId":"summary"},"model00000165cf091c73_00000003":{"id":"model00000165cf091c73_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf091c73_00000000","itemId":"Usage_.ORG_NAME","itemLabel":"Org Name"}],"id":"model00000165cf091c73_00000001"}]},"visTypeLocked":true,"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cf091c73_00000000"],"dataItemSettings":[],"caption":"Value","id":"values","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"visId":"summary"},"model00000165cf1cbb37_00000000":{"id":"model00000165cf1cbb37_00000000","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf1cd341_00000000","itemId":"Usage_.Resource_Name","itemLabel":"Resource Name"},{"id":"model00000165cf1cdb72_00000001","itemId":"Usage_.Cost","itemLabel":"Cost"}],"id":"model00000165cf1cd340_00000001"}]},"visTypeLocked":true,"slotmapping":{"slots":[{"name":"categories","dataItems":["model00000165cf1cd341_00000000"],"dataItemSettings":[],"caption":"Segments","id":"categories","layerId":"data"},{"name":"values","dataItems":["model00000165cf1cdb72_00000001"],"caption":"Size","id":"values","layerId":"data"}]},"type":"live","visId":"com.ibm.vis.rave2bundlepie","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.RESOURCE_GROUP_ID","columnId":"Usage_.RESOURCE_GROUP_ID","values":[{"u":"Usage_.RESOURCE_GROUP_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null},{"id":"Usage_.Cost_sum","columnId":"Usage_.Cost","values":[{"d":0.01,"u":0.01},{"d":4148.17,"u":4148.17}],"excludedValues":[],"operator":"between","aggregationType":"sum","preOrPost":"post"}]},"model00000165cf1ae64c_00000000":{"id":"model00000165cf1ae64c_00000000","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf1af74d_00000000","itemId":"Usage_.Cost","itemLabel":"Cost"},{"id":"model00000165cf1b1ce3_00000001","itemId":"Usage_.ORG_NAME","itemLabel":"Org Name"}],"id":"model00000165cf1af74c_00000001"}]},"visTypeLocked":true,"slotmapping":{"slots":[{"name":"categories","dataItems":["model00000165cf1b1ce3_00000001"],"dataItemSettings":[],"caption":"Segments","id":"categories","layerId":"data"},{"name":"values","dataItems":["model00000165cf1af74d_00000000"],"caption":"Size","id":"values","layerId":"data"}]},"type":"live","visId":"com.ibm.vis.rave2bundlepie","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.RESOURCE_GROUP_ID","columnId":"Usage_.RESOURCE_GROUP_ID","values":[{"u":"Usage_.RESOURCE_GROUP_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null}]},"model00000165cf1f4719_00000003":{"id":"model00000165cf1f4719_00000003","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf1f4719_00000000","itemId":"Usage_.Cost","itemLabel":"Cost"}],"id":"model00000165cf1f4719_00000001"}]},"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cf1f4719_00000000"],"dataItemSettings":[],"caption":"Value","id":"values","layerId":"data"}]},"type":"live","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.ORG_ID","columnId":"Usage_.ORG_ID","values":[{"u":"Usage_.ORG_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null}],"visId":"summary"},"model00000165cf203a72_00000000":{"id":"model00000165cf203a72_00000000","data":{"dataViews":[{"modelRef":"model00000165cefceed9_00000002","dataItems":[{"id":"model00000165cf204641_00000002","itemId":"Usage_.Cost","itemLabel":"Cost"},{"id":"model00000165cf204edc_00000001","itemId":"Usage_.Resource_Name","itemLabel":"Resource Name"},{"id":"model00000165cf20ab29_00000001","itemId":"Usage_.RESOURCE_GROUP_NAME","itemLabel":"Resource Group Name"}],"id":"model00000165cf204641_00000001"}]},"visTypeLocked":true,"slotmapping":{"slots":[{"name":"values","dataItems":["model00000165cf204641_00000002"],"caption":"Length","id":"values"},{"name":"categories","dataItems":["model00000165cf204edc_00000001"],"dataItemSettings":[],"caption":"Bars","id":"categories"},{"name":"color","dataItems":["model00000165cf20ab29_00000001"],"caption":"Color","id":"color"}]},"type":"live","visId":"com.ibm.vis.rave2bundlestackedcolumn","name":{"translationTable":{}},"localFilters":[{"id":"Usage_.ORG_ID","columnId":"Usage_.ORG_ID","values":[{"u":"Usage_.ORG_ID->[]","d":"","selected":true}],"excludedValues":[],"operator":"in","type":null}]}}}
+    sequences:
+      billing-dashboard:
+        actions: billing-spec,openwhisk-cognos-dashboard/create-dashboard
+        web: true
+    apis:
+      Tutorial Dashboards:
+        tutorial:
+          billing:
+            billing-dashboard:
+              method: GET
+              response: http

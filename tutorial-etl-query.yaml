@@ -1,0 +1,17 @@
+packages:
+  tutorial-etl-query:
+    version: 1.0
+    license: Apache-2.0
+    dependencies:
+      openwhisk-sql-query:
+        location: github.com/IBM-Cloud/openwhisk-sql-query
+    actions:
+      billing-sql:
+        code: function main(params) { return params; }
+        runtime: nodejs:8
+        inputs:
+          statement: SELECT month,account_id,resource_id,resource_name,bround(billable_cost,2),organization_id,organization_name,resource_group_id,resource_group_name FROM cos://${LOCATION}/${BUCKET}/usage_* STORED AS JSON
+          resultset_target: cos://${LOCATION}/${BUCKET}/account-billing.csv
+    sequences:
+      billing-job:
+        actions: billing-sql,openwhisk-sql-query/sql-query

@@ -1,0 +1,100 @@
+packages:
+  tutorial-etl-process:
+    version: 1.0
+    license: Apache-2.0
+    inputs:
+      bucket: ${BUCKET}
+    actions:
+      foreach-org-get-billing:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/each
+          _path: resources
+          _action: tutorial-etl-process/cf-org-billing
+      pick-guid-region-from-org:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/pick
+          _keys: guid,region
+          _jsonatas: resources[0].metadata.guid;resources[0].entity.region
+      pick-account-org-region-from-account:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/pick
+          _keys: account,org,region
+          _jsonatas: resources[0].metadata.guid;_body.organizations_region[0].guid;_body.organizations_region[0].region
+      flatten-org-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/flatten
+          _keys: account_id,organization_id,organization_name,month
+          _array: resources
+      flatten-resource-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/flatten
+          _keys: account_id,resource_group_id,resource_group_name,month
+          _array: resources
+      usage-to-storage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/pick
+          _keys: body,key,bucket
+          _prefix: usage
+          _jsonatas: " $string($);_prefix & '_' & month & '_' & parent_name & '_' & resource_id & '.json';bucket"
+      foreach-resource-to-storage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/each
+          _path: resources
+          _action: tutorial-etl-process/resource-to-storage
+      map-common-schema:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/map
+          _keys: parent_id,parent_name,parent_id,parent_name
+          _jsonatas: organization_id;organization_name;resource_group_id;resource_group_name
+      foreach-resource-group-get-billing:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/each
+          _path: resources
+          _action: tutorial-etl-process/resource-group-billing
+    sequences:
+      cf-orgs-billing:
+        actions: |
+                  tutorial-etl-request/cf-orgs,
+                  foreach-org-get-billing
+      cf-org-billing:
+        actions: |
+                  tutorial-etl-request/cf-org,
+                  pick-guid-region-from-org,
+                  tutorial-etl-request/accounts-post-params,
+                  tutorial-etl-request/accounts,
+                  pick-account-org-region-from-account,
+                  tutorial-etl-request/cf-org-usage,
+                  flatten-org-usage,
+                  foreach-resource-to-storage
+      resource-groups-billing:
+        actions: |
+                  tutorial-etl-request/resource-groups,
+                  foreach-resource-group-get-billing
+      resource-group-billing:
+        actions: |
+                  tutorial-etl-request/resource-group-usage,
+                  flatten-resource-usage,
+                  foreach-resource-to-storage
+      resource-to-storage:
+        actions: |
+                  map-common-schema,
+                  usage-to-storage,
+                  cloud-object-storage/object-write

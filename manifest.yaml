@@ -1,0 +1,184 @@
+packages:
+  tutorial-etl-request:
+    version: 1.0
+    license: Apache-2.0
+    inputs:
+      _iamToken: ${IAM_TOKEN}
+      _uaaToken: ${UAA_TOKEN}
+    dependencies:
+      openwhisk-jsonetl:
+        location: github.com/IBM-Cloud/openwhisk-jsonetl
+    actions:
+      accounts:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://accountmanagement.bluemix.net/v1/accounts
+          _bearer: ${IAM_TOKEN}
+      accounts-post-params:
+        function: dist/AccountsBody.js
+        runtime: nodejs:8
+      cf-orgs:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://api.ng.bluemix.net/v2/organizations?order-by=name
+          _bearer: ${UAA_TOKEN}
+      cf-org:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://mccp.ng.bluemix.net/v2/organizations?q=name:{{entity.name}}&region=all
+          _bearer: ${UAA_TOKEN}
+      cf-org-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://metering-reporting.ng.bluemix.net/v4/accounts/{{account}}/organizations/{{region}}:{{org}}/usage/{{month}}?_names=true
+          _bearer: ${IAM_TOKEN}
+          month: ${MONTH}
+          _retain: account,region,org
+      resource-groups:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://resource-manager.bluemix.net/v1/resource_groups?account_id={{guid}}
+          _bearer: ${IAM_TOKEN}
+          _retain: account
+      resource-group-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://metering-reporting.ng.bluemix.net/v4/accounts/{{account_id}}/resource_groups/{{id}}/usage/{{month}}?_names=true
+          _bearer: ${IAM_TOKEN}
+          month: ${MONTH}
+          _retain: account_id,id
+  tutorial-etl-process:
+    version: 1.0
+    license: Apache-2.0
+    inputs:
+      bucket: ${BUCKET}
+    actions:
+      foreach-org-get-billing:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/each
+          _path: resources
+          _action: tutorial-etl-process/cf-org-billing
+      pick-guid-region-from-org:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/pick
+          _keys: guid,region
+          _jsonatas: resources[0].metadata.guid;resources[0].entity.region
+      pick-account-org-region-from-account:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/pick
+          _keys: account,org,region
+          _jsonatas: resources[0].metadata.guid;_body.organizations_region[0].guid;_body.organizations_region[0].region
+      flatten-org-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/flatten
+          _keys: account_id,organization_id,organization_name,month
+          _array: resources
+      usage-to-storage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/pick
+          _keys: body,key,bucket
+          _prefix: usage_
+          _jsonatas: " $string($);_prefix & '_' & month & '_' & organization_name & '_' & resource_id & '.json';bucket"
+      foreach-resource-to-storage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/each
+          _path: resources
+          _action: tutorial-etl-process/resource-to-storage
+      foreach-resource-group-get-billing:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/each
+          _path: resources
+          _action: tutorial-etl-process/resource-group-billing
+    sequences:
+      cf-orgs-billing:
+        actions: |
+                  tutorial-etl-request/cf-orgs,
+                  foreach-org-get-billing
+      cf-org-billing:
+        actions: |
+                  tutorial-etl-request/cf-org,
+                  pick-guid-region-from-org,
+                  tutorial-etl-request/accounts-post-params,
+                  tutorial-etl-request/accounts,
+                  pick-account-org-region-from-account,
+                  tutorial-etl-request/cf-org-usage,
+                  flatten-org-usage,
+                  foreach-resource-to-storage
+      resource-to-storage:
+        actions: |
+                  usage-to-storage,
+                  cloud-object-storage/object-write                 
+      resource-groups-billing:
+        actions: |
+                  tutorial-etl-request/resource-groups,
+                  foreach-resource-group-get-billing
+      resource-group-billing:
+        actions: |
+                  tutorial-etl-request/resource-group-usage,
+                  foreach-resource-to-storage
+  tutorial-etl-query:
+    version: 1.0
+    license: Apache-2.0
+    dependencies:
+      openwhisk-sql-query:
+        location: github.com/IBM-Cloud/openwhisk-sql-query
+    actions:
+      account-billing-job:
+        code: function main(params) { return params; }
+        runtime: nodejs:8
+        inputs:
+          statement: SELECT month,account_id,resource_id,resource_name,bround(billable_cost,2),organization_id,organization_name FROM cos://${REGION}/${BUCKET}/usage_* STORED AS JSON
+          resultset_target: cos://${REGION}/${BUCKET}/account-billing.csv
+    sequences:
+      account-billing:
+        actions: account-billing-job,openwhisk-sql-query/sql-query
+  tutorial-etl-dashboard:
+    version: 1.0
+    license: Apache-2.0
+    dependencies:
+      openwhisk-cognos-dashboard:
+        location: github.com/IBM-Cloud/openwhisk-cognos-dashboard
+    inputs:
+      apiGatewayId: ${API_GATEWAY_ID}
+    actions:
+      cf-billing-module:
+        function: dist/BillingModule.js
+        runtime: nodejs:8
+    sequences:
+      billing-dashboard:
+        actions: cf-billing-module,openwhisk-cognos-dashboard/create-dashboard
+        web: true
+    apis:
+      Tutorial Dashboards:
+        tutorial:
+          billing:
+            billing-dashboard:
+              method: GET
+              response: http
+      

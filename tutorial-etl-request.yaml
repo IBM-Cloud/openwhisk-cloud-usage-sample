@@ -1,0 +1,62 @@
+packages:
+  tutorial-etl-request:
+    version: 1.0
+    license: Apache-2.0
+    inputs:
+      _iamToken: ${IAM_TOKEN}
+      _uaaToken: ${UAA_TOKEN}
+    dependencies:
+      openwhisk-jsonetl:
+        location: github.com/IBM-Cloud/openwhisk-jsonetl
+    actions:
+      accounts:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://accountmanagement.bluemix.net/coe/v2/getaccounts
+          _bearer: ${UAA_TOKEN}
+          _retain: _body
+      accounts-post-params:
+        function: dist/AccountsBody.js
+        runtime: nodejs:8
+      cf-orgs:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://api.ng.bluemix.net/v2/organizations?order-by=name
+          _bearer: ${UAA_TOKEN}
+      cf-org:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://mccp.ng.bluemix.net/v2/organizations?q=name:{{entity.name}}&region=all
+          _bearer: ${UAA_TOKEN}
+      cf-org-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://metering-reporting.ng.bluemix.net/v4/accounts/{{account}}/organizations/{{region}}:{{org}}/usage/{{month}}?_names=true
+          _bearer: ${IAM_TOKEN}
+          month: ${MONTH}
+          _retain: account,region,org
+      resource-groups:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://resource-manager.bluemix.net/v1/resource_groups?account_id={{guid}}
+          _bearer: ${IAM_TOKEN}
+          _retain: account
+      resource-group-usage:
+        function: dist/Action.js
+        runtime: nodejs:8
+        inputs:
+          _invoke: openwhisk-jsonetl/request
+          _url: https://metering-reporting.ng.bluemix.net/v4/accounts/{{account_id}}/resource_groups/{{id}}/usage/{{month}}?_names=true
+          _bearer: ${IAM_TOKEN}
+          month: ${MONTH}
+          _retain: account_id,id
