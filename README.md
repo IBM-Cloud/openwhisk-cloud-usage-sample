@@ -95,7 +95,7 @@ To obtain and process billing and usage data, you'll execute several IBM Cloud F
 
 2. Start the sequence to retrieve and process resource group's usage for the account. You can watch progress using the [Monitor](https://console.bluemix.net/openwhisk/dashboard) dashboard in the IBM Cloud Functions service.
     ```sh
-    ibmcloud fn action invoke tutorial-etl-process/resource-groups-billing --param guid e97a8c01ac694e308ef3ad77958e7d50 -r
+    ibmcloud fn action invoke tutorial-etl-process/resource-groups-billing --param guid <your guid> -r
     ```
 
 3. After all data has been collected, run the sequence to collect Cloud Foundry usage for the account.
@@ -103,7 +103,7 @@ To obtain and process billing and usage data, you'll execute several IBM Cloud F
     ibmcloud fn action invoke tutorial-etl-process/cf-orgs-billing -r
     ```
 
-4. Check you Cloud Object Storage bucket, it should now contain files that contain usage data for the various services and resources.
+4. Check your Cloud Object Storage bucket, it should now contain files that contain usage data for the various services and resources.
 
 5. Open the **usage-tutorial-sql** services UI from the [Dashboard](https://console.bluemix.net/dashboard/apps).
 
@@ -114,14 +114,10 @@ To obtain and process billing and usage data, you'll execute several IBM Cloud F
 
 7. Once the SQL Query job has completed, copy the `job_id` returned from the sequence.
 
-8. Run the following command to get the URL to the billing dashboard. Append the `job_id` value to the URL similar to the example below.
+8. Run the following command to get the URL to the billing dashboard. Append the `job_id` value to the URL similar to this example `https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/<your gateway id>/tutorial/billing?job_id=<your job id>`.
 
     ```sh
     ibmcloud fn api list | grep 'Tutorial Dashboard'
-    ```
-
-    ```curl
-    https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/<your gateway id>/tutorial/billing?job_id=<your job id>
     ```
 
 9. Visit the dashboard URL in your browser to see a pre-created Cognos Embedded Dashboard with your usage data.
