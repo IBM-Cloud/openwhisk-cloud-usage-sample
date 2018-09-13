@@ -11,7 +11,7 @@ packages:
         runtime: nodejs:8
         inputs:
           statement: SELECT month,account_id,resource_id,resource_name,bround(billable_cost,2),organization_id,organization_name,resource_group_id,resource_group_name FROM cos://${LOCATION}/${BUCKET}/usage_* STORED AS JSON
-          resultset_target: cos://${LOCATION}/${BUCKET}/account-billing.csv
+          resultset_target: cos://${LOCATION}/${BUCKET}/billing
     sequences:
       billing-job:
         actions: billing-sql,openwhisk-sql-query/sql-query
