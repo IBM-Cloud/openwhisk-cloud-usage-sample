@@ -20,7 +20,7 @@ The samples are supported by the following IBM Cloud Functions packages:
 
 To deploy the application, use the below commands and installation scripts.
 
-1. Using your terminal, change directory to the donwload repo.
+1. Using your terminal, change directory to the downloaded repo.
 
 1. Login to IBM Cloud and target your Cloud Foundry account. See [CLI Getting Started](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started).
     ```sh
@@ -129,3 +129,31 @@ To obtain and process billing and usage data, you'll execute several IBM Cloud F
     ```
 
 9. Visit the dashboard URL in your browser to see a pre-created Cognos Embedded Dashboard with your usage data.
+
+## FAQ
+
+### Why are the Cloud Functions failing?
+It's likely that the authentication tokens (UAA and IAM) have expired. Run the following to update the `tutorial-etl-request` package with more recent tokens.
+
+```sh
+export IAM_TOKEN=`ibmcloud iam oauth-tokens | head -n 1 | awk ' {print $4} '`
+```
+
+```sh
+export UAA_TOKEN=`ibmcloud iam oauth-tokens | tail -n 1 | awk ' {print $4} '`
+```
+
+```sh
+make update-request
+```
+
+### How do I uninstall?
+Run the following make commands to remove the packages and services.
+
+```sh
+make undeploy
+```
+
+```sh
+make remove-services
+```

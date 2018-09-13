@@ -17,6 +17,13 @@ create-services:
 	ibmcloud resource service-instance-create $(COGNOS_DASHBOARD) dynamic-dashboard-embedded $(PLAN) $(REGION) -t $(PREFIX)
 	ibmcloud resource service-key-create $(COGNOS_DASHBOARD)-creds Viewer --instance-name $(COGNOS_DASHBOARD)
 
+remove-services:
+	ibmcloud resource service-key-delete $(COGNOS_DASHBOARD)-creds
+	ibmcloud resource service-key-delete $(CLOUD_OBJECT_STORAGE)-creds
+	ibmcloud resource service-instance-delete $(CLOUD_OBJECT_STORAGE)
+	ibmcloud resource service-instance-delete $(SQL_QUERY)
+	ibmcloud resource service-instance-delete $(COGNOS_DASHBOARD)
+
 download-wskdeploy:
 	curl -L https://github.com/apache/incubator-openwhisk-wskdeploy/releases/download/0.9.8-incubating/openwhisk_wskdeploy-0.9.8-incubating-mac-386.zip --output wskdeploy.zip
 	tar -zxvf wskdeploy.zip wskdeploy
@@ -27,7 +34,12 @@ deploy:
 	wskdeploy -m tutorial-etl-process.yaml
 	wskdeploy -m tutorial-etl-query.yaml
 	wskdeploy -m tutorial-etl-dashboard.yaml
-	ibmcloud fn package update tutorial-etl-dashboard --param apiGatewayId `ibmcloud fn api list | grep 'Tutorial Dashboard' | awk ' {print $$5} ' |  awk -F[/] '{print $$7}'`
+
+undeploy:
+	wskdeploy undeploy -m tutorial-etl-request.yaml
+	wskdeploy undeploy -m tutorial-etl-process.yaml
+	wskdeploy undeploy -m tutorial-etl-query.yaml
+	wskdeploy undeploy -m tutorial-etl-dashboard.yaml
 
 update-request:
 	wskdeploy -m tutorial-etl-request.yaml
