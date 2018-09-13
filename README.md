@@ -14,7 +14,7 @@ The samples are supported by the following IBM Cloud Functions packages:
 
 2. Clone or download this repository.
 
-3. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). You can add the `wskdeploy` executable to your `PATH` or inside the directory for this tutorial. The `wsdeploy` executable will be used to deploy the various artifacts to IBM Cloud Functions.
+3. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). You can add the `wskdeploy` executable to your `PATH` or within the downloaded repo's directory. The `wsdeploy` executable will be used to deploy the various artifacts to IBM Cloud Functions.
 
 ## Setup
 
