@@ -14,7 +14,7 @@ create-services:
 	ibmcloud resource service-instance-create $(CLOUD_OBJECT_STORAGE) cloud-object-storage $(PLAN) global -t $(PREFIX)
 	ibmcloud resource service-key-create $(CLOUD_OBJECT_STORAGE)-creds Writer --instance-name $(CLOUD_OBJECT_STORAGE) --parameters '{"HMAC":true}'
 	ibmcloud resource service-instance-create $(SQL_QUERY) sql-query $(PLAN) $(REGION) -t $(PREFIX)
-	ibmcloud resource service-instance-create $(COGNOS_DASHBOARD)-cognos dynamic-dashboard-embedded $(PLAN) $(REGION) -t $(PREFIX)
+	ibmcloud resource service-instance-create $(COGNOS_DASHBOARD) dynamic-dashboard-embedded $(PLAN) $(REGION) -t $(PREFIX)
 	ibmcloud resource service-key-create $(COGNOS_DASHBOARD)-creds Viewer --instance-name $(COGNOS_DASHBOARD)
 
 download-wskdeploy:
