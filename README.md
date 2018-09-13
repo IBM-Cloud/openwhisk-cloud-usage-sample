@@ -3,20 +3,24 @@
 This project is a companion to the [Reviewing IBM Cloud services, resources and usage](https://console.bluemix.net/docs/tutorials/cloud-usage.html) tutorial. It implements an API-driven approach to obtain and visualize IBM Cloud usage and billing data.
 
 The samples are supported by the following IBM Cloud Functions packages:
-[OpenWhisk Cognos Dashboard](https://github.com/IBM-Cloud/openwhisk-cognos-dashboard)
-[OpenWhisk JSONetl](https://github.com/IBM-Cloud/openwhisk-jsonetl)
-[OpenWhisk SQL Query](https://github.com/IBM-Cloud/openwhisk-sql-query)
-[Cloud Object Storage](github.com/ibm-functions/package-cloud-object-storage)
+- [OpenWhisk Cognos Dashboard](https://github.com/IBM-Cloud/openwhisk-cognos-dashboard)
+- [OpenWhisk JSONetl](https://github.com/IBM-Cloud/openwhisk-jsonetl)
+- [OpenWhisk SQL Query](https://github.com/IBM-Cloud/openwhisk-sql-query)
+- [Cloud Object Storage](github.com/ibm-functions/package-cloud-object-storage)
 
 ## Before you begin
 
 1. Ensure that you have the appropriate roles to view billing and usage data. For instuctions, see the Assign permissions section of the tutorial.
+
+2. Clone or download this repository.
 
 2. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). You can add the `wskdeploy` executable to your `PATH` or inside the directory for this tutorial. The `wsdeploy` executable will be used to deploy the various artifacts to IBM Cloud Functions.
 
 ## Setup
 
 To deploy the application, use the below commands and installation scripts.
+
+1. Using your terminal, change directory to the donwload repo.
 
 1. Login to IBM Cloud and target your Cloud Foundry account. See [CLI Getting Started](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started).
     ```sh
@@ -27,12 +31,12 @@ To deploy the application, use the below commands and installation scripts.
     ibmcloud target --cf
     ```
 
-2. Run the following command from the provided makefile. This will create Lite instances of: Cloud Object Storage, SQL Query and Cognos Dashboard Embedded. To change the region where these services are deployed, edit the makefile and update the `REGION` variable. If you already have instances of these services, change the `PLAN` variable in the makefile to `Standard`.
+2. Run the following command from the provided makefile. This will create Lite instances of: `Cloud Object Storage`, `SQL Query` and `Cognos Dashboard Embedded`. To change the region where these services are deployed, edit the makefile and update the `REGION` variable. If you already have instances of these services, change the `PLAN` variable in the makefile to `Standard`.
     ```sh
     make create-services
     ```
 
-3. In your browser, access the **usage-tutorial-cos** service instance from the [Dashboard](https://console.bluemix.net/dashboard).
+3. In your browser, access you IBM Cloud [Dashboard](https://console.bluemix.net/dashboard). There should be three new services that begin with **usage-tutorial**. Access the **usage-tutorial-cos** service instance.
 
 4. Create a new bucket to store usage data.
     - Click the **Create a bucket** button.
