@@ -14,7 +14,7 @@ The samples are supported by the following IBM Cloud Functions packages:
 
 2. Clone or download this repository.
 
-2. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). You can add the `wskdeploy` executable to your `PATH` or inside the directory for this tutorial. The `wsdeploy` executable will be used to deploy the various artifacts to IBM Cloud Functions.
+3. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). You can add the `wskdeploy` executable to your `PATH` or inside the directory for this tutorial. The `wsdeploy` executable will be used to deploy the various artifacts to IBM Cloud Functions.
 
 ## Setup
 
@@ -36,7 +36,7 @@ To deploy the application, use the below commands and installation scripts.
     make create-services
     ```
 
-3. In your browser, access you IBM Cloud [Dashboard](https://console.bluemix.net/dashboard). There should be three new services that begin with **usage-tutorial**. Access the **usage-tutorial-cos** service instance.
+3. In your browser, access your IBM Cloud [Dashboard](https://console.bluemix.net/dashboard). There should be three new services that begin with **usage-tutorial**. Access the **usage-tutorial-cos** service instance.
 
 4. Create a new bucket to store usage data.
     - Click the **Create a bucket** button.
@@ -44,7 +44,7 @@ To deploy the application, use the below commands and installation scripts.
     - Select a location from the **Location**.
     - Provide a bucket **Name** and click **Create** If you receive an *AccessDenied* error, try with a more unique bucket name.
 
-5. Set the location and bucket name as an environment variable to be used later.
+5. Set the location and bucket name as an environment variable to be used later. Examples are `us-geo` and `ibmcloud-usage`.
     ```sh
     export LOCATION=<your location>
     ```
@@ -55,7 +55,7 @@ To deploy the application, use the below commands and installation scripts.
 
 6. Back in the [Dashboard](https://console.bluemix.net/dashboard), access the **usage-tutorial-sql** instance.
 
-7. Click the **Instance CRN** button to copy it to the clipboard, and again set an environment variable.
+7. Click the **Instance CRN** button (lower right corner of page) to copy it to the clipboard, and again set an environment variable.
     ```sh
     export INSTANCE_CRN=<your instance crn>
     ```
@@ -65,7 +65,7 @@ To deploy the application, use the below commands and installation scripts.
     export MONTH=2018-09
     ```
 
-9. Run the following commands to create a Platform API Key and Authentication Tokens to be used with the application. The API Key will be used with SQL Query. Authentication tokens will be used to make requests to obtain billing and usage data.
+9. Run the following commands to create a Platform API Key and Authentication Tokens to be used with the application. The API Key will be used with SQL Query. Authentication tokens will be used to make requests to obtain billing and usage data. Run the last command to confirm all have been set.
     ```sh
     export API_KEY=`ibmcloud iam api-key-create usage-tutorial-key -d 'apiKey created for http://github.com/IBM-Cloud/cloud-usage-samples' | grep 'API Key' | awk ' {print $3} '`
     ```
@@ -76,6 +76,10 @@ To deploy the application, use the below commands and installation scripts.
 
     ```sh
     export UAA_TOKEN=`ibmcloud iam oauth-tokens | tail -n 1 | awk ' {print $4} '`
+    ```
+
+    ```sh
+    echo -e API_KEY ' \t ' $API_KEY && echo -e IAM_TOKEN ' \t ' $IAM_TOKEN && echo -e UAA_TOKEN ' \t ' $UAA_TOKEN
     ```
 
 10. Deploy the tutorial package to IBM Cloud Functions.
@@ -92,14 +96,14 @@ To deploy the application, use the below commands and installation scripts.
 
 To obtain and process billing and usage data, you'll execute several IBM Cloud Functions sequences.
 
-1. Obtain an account GUID to fetch usage data. The account GUID you choose should match the **Account:** value seen in the `target` output.
+1. Obtain an account GUID to fetch usage data. The account GUID used should match the **Account:** value seen in the `target` output. Copy the account GUID to the clipboard.
     ```sh
     ibmcloud target && ibmcloud iam accounts
     ```
 
-2. Start the sequence to retrieve and process resource group's usage for the account. You can watch progress using the [Monitor](https://console.bluemix.net/openwhisk/dashboard) dashboard in the IBM Cloud Functions service.
+2. Start the sequence to retrieve and process resource group's usage for the account. You can watch progress using the [Monitor](https://console.bluemix.net/openwhisk/dashboard) dashboard in the IBM Cloud Functions service. The **Actitivity Log** should list actions with a green checkmark.
     ```sh
-    ibmcloud fn action invoke tutorial-etl-process/resource-groups-billing --param guid <your guid> -r
+    ibmcloud fn action invoke tutorial-etl-process/resource-groups-billing -r --param guid <your guid>
     ```
 
 3. After all data has been collected, run the sequence to collect Cloud Foundry usage for the account.
@@ -109,14 +113,14 @@ To obtain and process billing and usage data, you'll execute several IBM Cloud F
 
 4. Check your Cloud Object Storage bucket, it should now contain files that contain usage data for the various services and resources.
 
-5. Open the **usage-tutorial-sql** services UI from the [Dashboard](https://console.bluemix.net/dashboard/apps).
+5. Access the **usage-tutorial-sql** services from the [Dashboard](https://console.bluemix.net/dashboard/apps) and click the **Open UI** button.
 
 6. From the command line, run the following sequence. The SQL Query UI will show progress and the result data when complete.
     ```sh
     ibmcloud fn action invoke tutorial-etl-query/billing-job -r
     ```
 
-7. Once the SQL Query job has completed, copy the `job_id` returned from the sequence.
+7. Once the SQL Query job has completed, return to the command line and copy the `job_id` returned from the sequence.
 
 8. Run the following command to get the URL to the billing dashboard. Append the `job_id` value to the URL similar to this example `https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/<your gateway id>/tutorial/billing?job_id=<your job id>`.
 
