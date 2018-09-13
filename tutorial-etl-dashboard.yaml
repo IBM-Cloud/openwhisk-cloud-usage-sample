@@ -5,8 +5,6 @@ packages:
     dependencies:
       openwhisk-cognos-dashboard:
         location: github.com/IBM-Cloud/openwhisk-cognos-dashboard
-    inputs:
-      apiGatewayId: ${API_GATEWAY_ID}
     actions:
       billing-table:
         function: dist/Module.js
