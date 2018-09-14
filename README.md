@@ -10,11 +10,11 @@ The samples are supported by the following IBM Cloud Functions packages:
 
 ## Before you begin
 
-1. Ensure that you have the appropriate roles to view billing and usage data. For instuctions, see the Assign permissions section of the tutorial.
+1. Ensure that you have the appropriate roles to view billing and usage data. For instuctions, see the [Assign permissions](https://console.bluemix.net/docs/tutorials/cloud-usage.html#assign-permissions) section of the tutorial.
 
 2. Clone or download this repository.
 
-3. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). You can add the `wskdeploy` executable to your `PATH` or within the downloaded repo's directory. The `wsdeploy` executable will be used to deploy the various artifacts to IBM Cloud Functions.
+3. Download and install [wskdeploy](https://github.com/apache/incubator-openwhisk-wskdeploy/releases/tag/0.9.8-incubating). Add the `wskdeploy` executable to your `PATH`. It will be used to deploy the various artifacts to IBM Cloud Functions.
 
 ## Setup
 
@@ -22,19 +22,40 @@ To deploy the application, use the below commands and installation scripts.
 
 1. Using your terminal, change directory to the downloaded repo.
 
-1. Login to IBM Cloud and target your Cloud Foundry account. See [CLI Getting Started](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started).
+1. Login to IBM Cloud and target your Cloud Foundry account. See [CLI Getting Started](https://console.bluemix.net/docs/cli/reference/bluemix_cli/get_started.html#getting-started). Federated users should add the `--sso` flag.
     ```sh
-    ibmcloud login
+    ibmcloud login [--sso]
     ```
 
     ```sh
     ibmcloud target --cf
     ```
 
-2. Run the following command from the provided makefile. This will create Lite instances of: `Cloud Object Storage`, `SQL Query` and `Cognos Dashboard Embedded`. To change the region where these services are deployed, edit the makefile and update the `REGION` variable. If you already have instances of these services, change the `PLAN` variable in the makefile to `Standard`.
-    ```sh
-    make create-services
-    ```
+2. The following commands create the needed services: `Cloud Object Storage`, `SQL Query` and `Cognos Dashboard Embedded`. If you already have a service deployed, choose the **paid** command. To change the region where these services are deployed, edit the makefile and update the `REGION` variable.
+    1. Create `Cognos Dashboard Embedded` using either of the following.
+        ```sh
+        make create-cognos-lite
+        ```
+
+        ```sh
+        make create-cognos-paid
+        ```
+    2. Create `Cloud Object Storage` using either of the following.
+        ```sh
+        make create-cos-lite
+        ```
+
+        ```sh
+        make create-cos-paid
+        ```
+    3. Create `SQL Query` services either of the following.
+        ```sh
+        make create-sql-lite
+        ```
+
+        ```sh
+        make create-sql-paid
+        ```
 
 3. In your browser, access your IBM Cloud [Dashboard](https://console.bluemix.net/dashboard). There should be three new services that begin with **usage-tutorial**. Access the **usage-tutorial-cos** service instance.
 
@@ -82,7 +103,11 @@ To deploy the application, use the below commands and installation scripts.
     echo -e API_KEY ' \t ' $API_KEY && echo -e IAM_TOKEN ' \t ' $IAM_TOKEN && echo -e UAA_TOKEN ' \t ' $UAA_TOKEN
     ```
 
-10. Deploy the tutorial package to IBM Cloud Functions.
+10. Deploy the tutorial package to IBM Cloud Functions. The first command will ensure `wskdeploy` is properly initialized.
+    ```sh
+    ibmcloud fn package list
+    ```
+
     ```sh
     make deploy
     ```
@@ -157,3 +182,21 @@ make undeploy
 ```sh
 make remove-services
 ```
+
+### My wskdeploy failed with an 'Invalid access token (expired)' error. What do I do?
+
+The following indicates that your `.wskprops` file is stale.
+
+```
+Error: servicedeployer.go [1660]: [ERROR_WHISK_CLIENT_ERROR]: Error code: 246: API creation failure: Unable to obtain API(s) from the API Gateway (status code 400): Invalid access token (expired)
+```
+
+Delete your `/Users/<username>/.wskprops` file. Then issue the following command to recreate it.
+
+```sh
+ibmcloud fn package list
+```
+
+### How do I use my existing services rather than deploying new ones?
+
+Edit the makefile's `bind-services` target. Change the --instance flag to reflect the names of your existing services.

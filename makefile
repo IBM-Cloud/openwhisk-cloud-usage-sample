@@ -1,4 +1,3 @@
-PLAN=lite # standard | lite
 PREFIX=usage-tutorial
 REGION=us-south
 
@@ -10,12 +9,27 @@ bind-services:
 	ibmcloud fn service bind cloud-object-storage cloud-object-storage --instance $(CLOUD_OBJECT_STORAGE)
 	ibmcloud fn service bind dynamic-dashboard-embedded openwhisk-cognos-dashboard --instance $(COGNOS_DASHBOARD)
 
-create-services:
-	ibmcloud resource service-instance-create $(CLOUD_OBJECT_STORAGE) cloud-object-storage $(PLAN) global -t $(PREFIX)
-	ibmcloud resource service-key-create $(CLOUD_OBJECT_STORAGE)-creds Writer --instance-name $(CLOUD_OBJECT_STORAGE) --parameters '{"HMAC":true}'
-	ibmcloud resource service-instance-create $(SQL_QUERY) sql-query $(PLAN) $(REGION) -t $(PREFIX)
-	ibmcloud resource service-instance-create $(COGNOS_DASHBOARD) dynamic-dashboard-embedded $(PLAN) $(REGION) -t $(PREFIX)
+create-cognos-lite:
+	ibmcloud resource service-instance-create $(COGNOS_DASHBOARD) dynamic-dashboard-embedded lite $(REGION) -t $(PREFIX)
 	ibmcloud resource service-key-create $(COGNOS_DASHBOARD)-creds Viewer --instance-name $(COGNOS_DASHBOARD)
+	
+create-cos-lite:
+	ibmcloud resource service-instance-create $(CLOUD_OBJECT_STORAGE) cloud-object-storage lite global -t $(PREFIX)
+	ibmcloud resource service-key-create $(CLOUD_OBJECT_STORAGE)-creds Writer --instance-name $(CLOUD_OBJECT_STORAGE) --parameters '{"HMAC":true}'
+
+create-sql-lite:
+	ibmcloud resource service-instance-create $(SQL_QUERY) sql-query lite $(REGION) -t $(PREFIX)
+
+create-cognos-paid:
+	ibmcloud resource service-instance-create $(COGNOS_DASHBOARD) dynamic-dashboard-embedded paygo $(REGION) -t $(PREFIX)
+	ibmcloud resource service-key-create $(COGNOS_DASHBOARD)-creds Viewer --instance-name $(COGNOS_DASHBOARD)
+	
+create-cos-paid:
+	ibmcloud resource service-instance-create $(CLOUD_OBJECT_STORAGE) cloud-object-storage standard global -t $(PREFIX)
+	ibmcloud resource service-key-create $(CLOUD_OBJECT_STORAGE)-creds Writer --instance-name $(CLOUD_OBJECT_STORAGE) --parameters '{"HMAC":true}'
+
+create-sql-paid:
+	ibmcloud resource service-instance-create $(SQL_QUERY) sql-query standard $(REGION) -t $(PREFIX)
 
 remove-services:
 	ibmcloud resource service-key-delete $(COGNOS_DASHBOARD)-creds
@@ -52,6 +66,3 @@ update-query:
 
 update-dashboard:
 	wskdeploy -m tutorial-etl-dashboard.yaml
-
-
-
