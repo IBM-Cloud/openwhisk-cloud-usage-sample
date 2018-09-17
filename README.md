@@ -2,6 +2,8 @@
 
 This project is a companion to the [Reviewing IBM Cloud services, resources and usage](https://console.bluemix.net/docs/tutorials/cloud-usage.html) tutorial. It implements an API-driven approach to obtain and visualize IBM Cloud usage and billing data.
 
+![](screenshot.png)
+
 The samples are supported by the following IBM Cloud Functions packages:
 - [OpenWhisk Cognos Dashboard](https://github.com/IBM-Cloud/openwhisk-cognos-dashboard)
 - [OpenWhisk JSONetl](https://github.com/IBM-Cloud/openwhisk-jsonetl)
@@ -48,7 +50,7 @@ To deploy the application, use the below commands and installation scripts.
         ```sh
         make create-cos-paid
         ```
-    3. Create `SQL Query` services either of the following.
+    3. Create `SQL Query` using either of the following.
         ```sh
         make create-sql-lite
         ```
@@ -199,4 +201,4 @@ ibmcloud fn package list
 
 ### How do I use my existing services rather than deploying new ones?
 
-Edit the makefile's `bind-services` target. Change the --instance flag to reflect the names of your existing services.
+Edit the makefile's `bind-services` target. Change the `--instance` flag to reflect the names of your existing services.
